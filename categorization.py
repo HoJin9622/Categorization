@@ -25,16 +25,18 @@ def frequency_extractor(doc):
 
     return bow
 
+
 # cosine similarity 함수
 def cos_similarity(A, B):
-    return dot(A, B)/(norm(A)*norm(B))
+    return dot(A, B) / (norm(A) * norm(B))
+
 
 # 형용사 분석 및 품사 태깅
 doc = [
-    okt.nouns(u'저는 사과 좋아요.'),
-    okt.nouns(u'저는 바나나 좋아요.'),
-    okt.nouns(u'저는 바나나 좋아요 저는 바나나 좋아요 저는 사과 좋아요 저는 사과 좋아요 저는 키위 좋아요.'),
-    okt.nouns(u'저는 바나나 좋아요.')
+    okt.nouns(u"저는 사과 좋아요."),
+    okt.nouns(u"저는 바나나 좋아요."),
+    okt.nouns(u"저는 바나나 좋아요 저는 바나나 좋아요 저는 사과 좋아요 저는 사과 좋아요 저는 키위 좋아요."),
+    okt.nouns(u"저는 바나나 좋아요."),
 ]
 
 bow = frequency_extractor(doc)
