@@ -25,11 +25,13 @@ def frequency_extractor(document):  # 빈도 행렬 추출 함수.
     return frequency  # 빈도를 나타내는 말뭉치 반환.
 
 
-def cos_similarity(a, b):  # 유사도 측정 함수.
+def cos_similarity(a, b):  # 유사도 측정 함수, 유사도가 높으면 0, 낮으면 1을 반환한다.
     temp = norm(a) * norm(b)
-    if temp == 0:
-        return 0
-    return 1 - dot(a, b) / (norm(a) * norm(b))  # 유사도 측정 식.
+    if temp > 0:  # 0으로 나눌 수 없으므로 temp 값이 0이면 최대값인 1을 반환한다.
+        result = 1 - dot(a, b) / temp  # 만약 temp 값이 0이 아닌 경우, 계산하는 식.
+    else:
+        result = 1
+    return result
 
 
 def two_dimension_matrix(frequency):
@@ -47,29 +49,29 @@ def hierarchical_clustering(matrix, n_clusters=2):  # 계층적 군집화 알고
 def noun_extractor(txt_folder):
     okt = Okt()  # Twitter 클래스의 객체 선언.
     doc = []
-    print("처리 중...")
+
     for root, dirs, files in os.walk(txt_folder):  # 폴더 안의 모든 문서를 불러옴.
         for fname in files:
             full_fname = os.path.join(root, fname)
-            f = open(full_fname, "r")
-            data = f.read()  # 각 문서의 모든 문자를 반환.
+            try:
+                f = open(full_fname, "r", encoding="UTF-8")
+                data = f.read()  # 각 문서의 모든 문자를 반환.
+            except:
+                f = open(full_fname, "r", encoding="ANSI")
+                data = f.read()  # 각 문서의 모든 문자를 반환.
             doc.append(okt.nouns(data))  # 반환한 문자를 이용하여 토큰화 수행(명사 추출).
             f.close()
-    print("완료")
 
     return doc
 
 
-def move_sorted_file(file_list, txt_folder, py_folder, after, clustering_result):
-    for i in range(len(file_list)):
-        before_dir = f"{txt_folder}\\{file_list[i]}"
-        after_dir = f"{py_folder}\\{after}\\{clustering_result[i]}"
-        try:
-            if not (os.path.isdir(after_dir)):
-                os.makedirs(os.path.join(after_dir))
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                print("Failed to create directory!!!!!")
-                raise
-        after_dir = f"{after_dir}\\{file_list[i]}"
-        shutil.move(before_dir, after_dir)
+def move_sorted_file(file_list, txt_folder, py_folder, after, clustering_result):  # 파일을 분류한대로 옮기는 함수.
+    for i in range(len(file_list)):  # 전체 파일 수만큼 반복.
+        before_dir = f"{txt_folder}\\{file_list[i]}"  # 분류 전 파일들의 폴더 경로.
+        after_dir = f"{py_folder}\\{after}\\{clustering_result[i]}"  # 분류 이후 파일을 옮길 폴더의 경로.
+
+        if not (os.path.isdir(after_dir)):  # 만약 존재하지 않는 경로일 경우.
+            os.makedirs(os.path.join(after_dir))  # 경로 생성.
+
+        after_dir = f"{after_dir}\\{file_list[i]}"  # 각 파일들의 경로.
+        shutil.move(before_dir, after_dir)  # 파일을 옮기는 함수 수행.
